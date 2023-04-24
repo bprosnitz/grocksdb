@@ -6,6 +6,7 @@ import "C"
 
 import (
 	"fmt"
+	"unsafe"
 )
 
 // Transaction is used with TransactionDB for transaction support.
@@ -51,6 +52,7 @@ func (transaction *Transaction) Commit() (err error) {
 	var cErr *C.char
 	C.rocksdb_transaction_commit(transaction.c, &cErr)
 	err = fromCError(cErr)
+	C.rocksdb_free(unsafe.Pointer(transaction.c))
 	return
 }
 
@@ -59,6 +61,7 @@ func (transaction *Transaction) Rollback() (err error) {
 	var cErr *C.char
 	C.rocksdb_transaction_rollback(transaction.c, &cErr)
 	err = fromCError(cErr)
+	C.rocksdb_free(unsafe.Pointer(transaction.c))
 	return
 }
 
